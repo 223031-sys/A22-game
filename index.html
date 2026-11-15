@@ -644,6 +644,20 @@
     // --- Input Handling ---
     document.addEventListener('keydown', (e) => {
         if (isGameOver) return;
+        if (e.keyCode === 80) { // Pだけは停止中にも受け付ける
+            if (e.repeat) return;
+            isPaused = !isPaused;
+            if (isPaused) {
+                cancelAnimationFrame(requestId);
+            } else {
+                requestId = requestAnimationFrame((time) => {
+                    lastTime = time;
+                    animate(time);
+                });
+            }
+            return;
+        }
+        if (isPaused) return;
         
         switch (e.keyCode) {
             case 37: // Left
@@ -670,16 +684,6 @@
             case 16: // Shift (Hold)
                 hold();
                 draw();
-                break;
-            case 80: // 'P' to pause
-                isPaused = !isPaused;
-                if (!isPaused) {
-                    // ポーズ解除時も正確なタイムスタンプで再開
-                    requestId = requestAnimationFrame((time) => {
-                        lastTime = time;
-                        animate(time);
-                    });
-                }
                 break;
         }
     });
